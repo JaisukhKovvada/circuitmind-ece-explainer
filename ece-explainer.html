@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CircuitMind — ECE Component Explainer</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #12121a;
+    --border: #1e1e2e;
+    --accent: #00ff9d;
+    --accent2: #ff6b35;
+    --text: #e8e8f0;
+    --muted: #6b6b80;
+    --glow: rgba(0,255,157,0.15);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Grid background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(0,255,157,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,255,157,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    position: relative;
+    z-index: 1;
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 48px 24px;
+  }
+
+  /* Header */
+  header {
+    margin-bottom: 56px;
+  }
+
+  .badge {
+    display: inline-block;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--accent);
+    border: 1px solid var(--accent);
+    padding: 4px 10px;
+    letter-spacing: 2px;
+    margin-bottom: 20px;
+    animation: fadeIn 0.6s ease;
+  }
+
+  h1 {
+    font-size: clamp(2.2rem, 5vw, 3.6rem);
+    font-weight: 800;
+    line-height: 1.05;
+    letter-spacing: -1px;
+    animation: slideUp 0.7s ease;
+  }
+
+  h1 span {
+    color: var(--accent);
+    position: relative;
+  }
+
+  .subtitle {
+    margin-top: 14px;
+    color: var(--muted);
+    font-size: 1rem;
+    font-weight: 400;
+    animation: slideUp 0.8s ease;
+  }
+
+  /* Search area */
+  .search-area {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 28px;
+    margin-bottom: 32px;
+    position: relative;
+    animation: slideUp 0.9s ease;
+  }
+
+  .search-area::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--accent), transparent);
+  }
+
+  .input-row {
+    display: flex;
+    gap: 12px;
+    align-items: stretch;
+  }
+
+  input[type="text"] {
+    flex: 1;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: 'Space Mono', monospace;
+    font-size: 0.95rem;
+    padding: 14px 18px;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+
+  input[type="text"]:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--glow);
+  }
+
+  input[type="text"]::placeholder {
+    color: var(--muted);
+  }
+
+  button#explainBtn {
+    background: var(--accent);
+    color: #0a0a0f;
+    border: none;
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 0.9rem;
+    padding: 14px 28px;
+    cursor: pointer;
+    letter-spacing: 1px;
+    transition: opacity 0.2s, transform 0.1s;
+    white-space: nowrap;
+  }
+
+  button#explainBtn:hover { opacity: 0.85; }
+  button#explainBtn:active { transform: scale(0.98); }
+  button#explainBtn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  /* Quick chips */
+  .chips {
+    margin-top: 16px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .chip {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    padding: 5px 12px;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.15s;
+    letter-spacing: 0.5px;
+  }
+
+  .chip:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  /* Output */
+  #output {
+    display: none;
+    animation: fadeIn 0.5s ease;
+  }
+
+  .result-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .result-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--accent2), var(--accent));
+  }
+
+  .result-header {
+    padding: 20px 28px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .result-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 2px;
+  }
+
+  .component-name {
+    font-family: 'Space Mono', monospace;
+    font-size: 13px;
+    color: var(--muted);
+  }
+
+  .result-body {
+    padding: 28px;
+  }
+
+  /* Sections rendered by JS */
+  .section {
+    margin-bottom: 28px;
+  }
+
+  .section:last-child { margin-bottom: 0; }
+
+  .section-title {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 2px;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .section-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  .section-content {
+    color: var(--text);
+    font-size: 0.95rem;
+    line-height: 1.75;
+    font-weight: 400;
+  }
+
+  .tag-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 4px;
+  }
+
+  .tag {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    padding: 4px 10px;
+    background: rgba(0,255,157,0.07);
+    border: 1px solid rgba(0,255,157,0.2);
+    color: var(--accent);
+  }
+
+  /* Loading */
+  .loading {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 28px;
+    color: var(--muted);
+    font-family: 'Space Mono', monospace;
+    font-size: 13px;
+  }
+
+  .dot-pulse {
+    display: flex;
+    gap: 4px;
+  }
+
+  .dot-pulse span {
+    width: 6px;
+    height: 6px;
+    background: var(--accent);
+    border-radius: 50%;
+    animation: pulse 1.2s infinite;
+  }
+
+  .dot-pulse span:nth-child(2) { animation-delay: 0.2s; }
+  .dot-pulse span:nth-child(3) { animation-delay: 0.4s; }
+
+  /* Error */
+  .error-msg {
+    padding: 20px 28px;
+    color: var(--accent2);
+    font-family: 'Space Mono', monospace;
+    font-size: 13px;
+  }
+
+  /* Footer */
+  footer {
+    margin-top: 56px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: var(--muted);
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    animation: fadeIn 1.2s ease;
+  }
+
+  .powered {
+    color: var(--accent);
+  }
+
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes slideUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes pulse { 0%, 80%, 100% { opacity: 0.2; transform: scale(0.8); } 40% { opacity: 1; transform: scale(1); } }
+
+  @media (max-width: 600px) {
+    .input-row { flex-direction: column; }
+    button#explainBtn { width: 100%; }
+    footer { flex-direction: column; gap: 8px; text-align: center; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <header>
+    <div class="badge">// ECE AI TOOL</div>
+    <h1>Circuit<span>Mind</span></h1>
+    <p class="subtitle">Ask about any electronic component or concept — get a clear, structured breakdown powered by AI.</p>
+  </header>
+
+  <div class="search-area">
+    <div class="input-row">
+      <input type="text" id="query" placeholder="e.g. 555 Timer, MOSFET, Op-Amp, BJT, ADC..." />
+      <button id="explainBtn" onclick="explain()">EXPLAIN →</button>
+    </div>
+    <div class="chips">
+      <span class="chip" onclick="setQuery('555 Timer')">555 Timer</span>
+      <span class="chip" onclick="setQuery('MOSFET')">MOSFET</span>
+      <span class="chip" onclick="setQuery('Op-Amp')">Op-Amp</span>
+      <span class="chip" onclick="setQuery('PLL Circuit')">PLL Circuit</span>
+      <span class="chip" onclick="setQuery('ADC')">ADC</span>
+      <span class="chip" onclick="setQuery('Zener Diode')">Zener Diode</span>
+      <span class="chip" onclick="setQuery('H-Bridge')">H-Bridge</span>
+      <span class="chip" onclick="setQuery('FPGA')">FPGA</span>
+    </div>
+  </div>
+
+  <div id="output">
+    <div class="result-card" id="resultCard"></div>
+  </div>
+
+  <footer>
+    <span>CIRCUITMIND v1.0</span>
+    <span>Powered by <span class="powered">Claude AI</span></span>
+  </footer>
+
+</div>
+
+<script>
+  function setQuery(val) {
+    document.getElementById('query').value = val;
+    explain();
+  }
+
+  document.getElementById('query').addEventListener('keydown', e => {
+    if (e.key === 'Enter') explain();
+  });
+
+  async function explain() {
+    const query = document.getElementById('query').value.trim();
+    if (!query) return;
+
+    const btn = document.getElementById('explainBtn');
+    const output = document.getElementById('output');
+    const card = document.getElementById('resultCard');
+
+    btn.disabled = true;
+    btn.textContent = 'THINKING...';
+    output.style.display = 'block';
+
+    card.innerHTML = `
+      <div class="loading">
+        <div class="dot-pulse"><span></span><span></span><span></span></div>
+        Analyzing ${query}...
+      </div>`;
+
+    const prompt = `You are an expert ECE (Electronics and Computer Engineering) tutor. A student has asked about: "${query}"
+
+Respond ONLY in this exact JSON format, no markdown, no extra text:
+{
+  "component": "<name of the component/concept>",
+  "oneLiner": "<one sentence of what it is>",
+  "howItWorks": "<2-3 sentences explaining the working principle clearly>",
+  "keySpecs": ["<spec 1>", "<spec 2>", "<spec 3>", "<spec 4>"],
+  "commonUses": "<2-3 real-world use cases>",
+  "eceTip": "<one practical tip or insight an ECE student should know>",
+  "relatedTopics": ["<topic1>", "<topic2>", "<topic3>"]
+}`;
+
+    try {
+      const res = await fetch("https://api.anthropic.com/v1/messages", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          model: "claude-sonnet-4-20250514",
+          max_tokens: 1000,
+          messages: [{ role: "user", content: prompt }]
+        })
+      });
+
+      const data = await res.json();
+      const text = data.content?.map(b => b.text || '').join('') || '';
+      const clean = text.replace(/```json|```/g, '').trim();
+      const parsed = JSON.parse(clean);
+      renderResult(parsed);
+
+    } catch (err) {
+      card.innerHTML = `<div class="error-msg">⚠ Error fetching explanation. Please try again.</div>`;
+    }
+
+    btn.disabled = false;
+    btn.textContent = 'EXPLAIN →';
+  }
+
+  function renderResult(d) {
+    const card = document.getElementById('resultCard');
+    card.innerHTML = `
+      <div class="result-header">
+        <span class="result-label">// COMPONENT ANALYSIS</span>
+        <span class="component-name">${d.component}</span>
+      </div>
+      <div class="result-body">
+
+        <div class="section">
+          <div class="section-title">OVERVIEW</div>
+          <div class="section-content">${d.oneLiner}</div>
+        </div>
+
+        <div class="section">
+          <div class="section-title">HOW IT WORKS</div>
+          <div class="section-content">${d.howItWorks}</div>
+        </div>
+
+        <div class="section">
+          <div class="section-title">KEY SPECS</div>
+          <div class="tag-row">
+            ${d.keySpecs.map(s => `<span class="tag">${s}</span>`).join('')}
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="section-title">COMMON USES</div>
+          <div class="section-content">${d.commonUses}</div>
+        </div>
+
+        <div class="section">
+          <div class="section-title">ECE STUDENT TIP</div>
+          <div class="section-content" style="color: #00ff9d; font-style: italic;">${d.eceTip}</div>
+        </div>
+
+        <div class="section">
+          <div class="section-title">RELATED TOPICS</div>
+          <div class="tag-row">
+            ${d.relatedTopics.map(t => `<span class="tag" style="cursor:pointer" onclick="setQuery('${t}')">${t}</span>`).join('')}
+          </div>
+        </div>
+
+      </div>`;
+  }
+</script>
+</body>
+</html>
