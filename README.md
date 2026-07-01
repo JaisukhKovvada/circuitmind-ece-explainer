@@ -1,31 +1,98 @@
-# circuitmind-ece-explainer
-# CircuitMind — ECE Component Explainer
+# CircuitMind – ECE Component Explainer
 
-An AI-powered web tool that explains any electronic component or concept in a clean, structured format — built for ECE students and engineers.
+CircuitMind is a responsive web application that helps Electronics and Communication Engineering students quickly understand electronic components through clear, structured, and user-friendly explanations.
 
-## What it does
+## Overview
 
-Type any component name (555 Timer, MOSFET, Op-Amp, FPGA, etc.) and instantly get:
-- Plain-English explanation of how it works
-- Key specifications
+CircuitMind was developed to simplify the learning process for electronic components by providing concise explanations in an intuitive interface. Instead of searching through lengthy articles or multiple websites, users can instantly access organized information in a single place.
+
+The application focuses on delivering a clean user experience with responsive layouts and fast interactions, making it suitable for students, hobbyists, and engineers.
+
+---
+
+## Features
+
+- Search for electronic components and engineering concepts
+- Clear, beginner-friendly explanations
+- Key specifications and practical applications
 - Real-world use cases
-- ECE student tips
-- Related topics to explore
+- Related concepts for further learning
+- Responsive interface for desktop and mobile devices
+- Simple and intuitive user experience
 
-## Why I built this
+---
 
-As an ECE student, I often needed quick, structured explanations of components while studying or working on projects. Existing resources were either too shallow or too dense. This tool gives the right depth — fast.
+## Technologies Used
 
-## Tech used
+- HTML5
+- CSS3
+- JavaScript (ES6)
+- Claude Sonnet 4 API
 
-- Vanilla HTML/CSS/JavaScript
-- Claude AI API (claude-sonnet-4)
-- Zero dependencies, single file, runs in any browser
+---
 
-## How to use
+## Design Focus
 
-Just open `ece-explainer.html` in any browser. No installation needed.
+While building CircuitMind, emphasis was placed on:
 
-## Built by
+- Responsive web design
+- Simple and intuitive user interface
+- Clear information hierarchy
+- Easy navigation
+- Fast user interaction
+- Readable and accessible content presentation
 
-Jaisukh — ECE Student, SRM University AP
+---
+
+## Project Structure
+
+```
+CircuitMind/
+│── ece-explainer.html
+│── style.css
+│── script.js
+│── README.md
+```
+
+---
+
+## How to Run
+
+1. Clone the repository.
+
+```
+git clone https://github.com/JaisukhKovvada/circuitmind-ece-explainer.git
+```
+
+2. Open the project folder.
+
+3. Launch `ece-explainer.html` in any modern web browser.
+
+No installation or additional dependencies are required.
+
+---
+
+## Future Improvements
+
+- Component images and circuit diagrams
+- Dark mode support
+- Bookmark favorite components
+- Search history
+- Interactive component comparison
+- Category-based browsing
+- Improved accessibility features
+
+---
+
+## Motivation
+
+As an ECE student, I wanted a faster and more user-friendly way to understand electronic components without navigating multiple resources. CircuitMind was built to provide a clean, responsive learning experience that enables users to find relevant information quickly and efficiently.
+
+---
+
+## Author
+
+**Jaisukh Kovvada**
+
+Electronics and Communication Engineering Student  
+SRM University AP
